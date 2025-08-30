@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyYP - Transform Your Notes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .input-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .output-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        h2 {
+            color: #4a5568;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        textarea {
+            width: 100%;
+            height: 300px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 14px;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .tool-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .quiz-settings {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+            border: 2px solid #e2e8f0;
+        }
+
+        .setting-group {
+            margin: 10px 0;
+        }
+
+        .setting-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .setting-group select, .setting-group input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .tool-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tool-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .tool-btn:active {
+            transform: translateY(0);
+        }
+
+        .output-content {
+            min-height: 300px;
+            border: 2px dashed #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            background: #f8fafc;
+            transition: all 0.3s ease;
+        }
+
+        .output-content.has-content {
+            border: 2px solid #667eea;
+            background: white;
+        }
+
+        .placeholder {
+            text-align: center;
+            color: #a0aec0;
+            font-style: italic;
+            margin-top: 50px;
+        }
+
+        .flashcard {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 10px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid #667eea;
+        }
+
+        .flashcard:hover {
+            transform: translateX(5px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .flashcard.flipped {
+            background: #f7fafc;
+            border-left-color: #48bb78;
+        }
+
+        .quiz-question {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .quiz-options {
+            margin-top: 15px;
+        }
+
+        .quiz-option {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin: 8px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-option:hover {
+            background: #edf2f7;
+            border-color: #667eea;
+        }
+
+        .quiz-option.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .quiz-option.correct {
+            background: #48bb78;
+            color: white;
+            border-color: #48bb78;
+        }
+
+        .quiz-option.incorrect {
+            background: #f56565;
+            color: white;
+            border-color: #f56565;
+        }
+
+        .summary-section {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+        }
+
+        .key-points {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .key-points li {
+            background: rgba(255, 255, 255, 0.1);
+            margin: 8px 0;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border-left: 4px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .stats {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .tool-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">StudyYP</div>
+            <div class="tagline">Transform your notes into powerful study tools</div>
+        </div>
+
+        <div class="main-content">
+            <div class="input-section">
+                <h2>📝 Your Notes</h2>
+                <textarea 
+                    id="notesInput" 
+                    placeholder="Paste your notes here and watch them transform into study materials! Try adding some content about any subject - history, science, literature, or any topic you're studying..."
+                ></textarea>
+                
+                <div class="tool-buttons">
+                    <button class="tool-btn" onclick="generateSummary()">
+                        <span id="summaryBtn">📋 Create Summary</span>
+                    </button>
+                    <button class="tool-btn" onclick="generateFlashcards()">
+                        <span id="flashcardsBtn">🃏 Make Flashcards</span>
+                    </button>
+                    <button class="tool-btn" onclick="toggleQuizSettings()">
+                        <span id="quizBtn">❓ Generate Quiz</span>
+                    </button>
+                    <button class="tool-btn" onclick="clearAll()">
+                        🗑️ Clear All
+                    </button>
+                </div>
+
+                <div class="quiz-settings" id="quizSettings" style="display: none;">
+                    <h3 style="margin-bottom: 15px; color: #4a5568;">Quiz Settings</h3>
+                    
+                    <div class="setting-group">
+                        <label for="numQuestions">Number of Questions:</label>
+                        <select id="numQuestions">
+                            <option value="3">3 questions</option>
+                            <option value="5" selected>5 questions</option>
+                            <option value="8">8 questions</option>
+                            <option value="10">10 questions</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-group">
+                        <label for="questionType">Question Type:</label>
+                        <select id="questionType">
+                            <option value="mixed" selected>Mixed Types</option>
+                            <option value="multiple-choice">Multiple Choice Only</option>
+                            <option value="true-false">True/False Only</option>
+                            <option value="fill-blank">Fill in the Blank</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-group">
+                        <label for="difficulty">Difficulty Level:</label>
+                        <select id="difficulty">
+                            <option value="easy">Easy</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 15px;">
+                        <button class="tool-btn" onclick="generateQuiz()" style="width: auto; padding: 10px 20px;">
+                            🚀 Create Quiz
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="output-section">
+                <h2 id="outputTitle">🎯 Study Tools</h2>
+                <div class="output-content" id="outputContent">
+                    <div class="placeholder">
+                        Select a study tool to get started!<br><br>
+                        ✨ <strong>Summary:</strong> Get key points and main ideas<br>
+                        🃏 <strong>Flashcards:</strong> Interactive cards for memorization<br>
+                        ❓ <strong>Quiz:</strong> Test your understanding
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats">
+            <h3>📊 Study Session Stats</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number" id="toolsGenerated">0</span>
+                    <span class="stat-label">Tools Generated</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="flashcardsCreated">0</span>
+                    <span class="stat-label">Flashcards Created</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="quizzesCompleted">0</span>
+                    <span class="stat-label">Quiz Questions</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let stats = {
+            toolsGenerated: 0,
+            flashcardsCreated: 0,
+            quizzesCompleted: 0
+        };
+
+        function updateStats() {
+            document.getElementById('toolsGenerated').textContent = stats.toolsGenerated;
+            document.getElementById('flashcardsCreated').textContent = stats.flashcardsCreated;
+            document.getElementById('quizzesCompleted').textContent = stats.quizzesCompleted;
+        }
+
+        function showLoading(buttonId, originalText) {
+            const button = document.getElementById(buttonId);
+            button.innerHTML = '<span class="loading"></span>Generating...';
+        }
+
+        function hideLoading(buttonId, originalText) {
+            const button = document.getElementById(buttonId);
+            button.innerHTML = originalText;
+        }
+
+        function generateSummary() {
+            const notes = document.getElementById('notesInput').value.trim();
+            if (!notes) {
+                alert('Please enter some notes first!');
+                return;
+            }
+
+            showLoading('summaryBtn', '📋 Create Summary');
+            
+            setTimeout(() => {
+                const sentences = notes.split(/[.!?]+/).filter(s => s.trim().length > 10);
+                const keyPoints = extractKeyPoints(sentences);
+                
+                const summaryHTML = `
+                    <div class="summary-section">
+                        <h3>📋 Summary</h3>
+                        <p style="margin: 15px 0; font-size: 1.1rem; line-height: 1.6;">
+                            ${generateSummaryText(sentences)}
+                        </p>
+                        
+                        <h4 style="margin-top: 20px; margin-bottom: 10px;">🔑 Key Points:</h4>
+                        <ul class="key-points">
+                            ${keyPoints.map(point => `<li>${point}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+                
+                displayOutput('📋 Summary Generated', summaryHTML);
+                stats.toolsGenerated++;
+                updateStats();
+                hideLoading('summaryBtn', '📋 Create Summary');
+            }, 1500);
+        }
+
+        function generateFlashcards() {
+            const notes = document.getElementById('notesInput').value.trim();
+            if (!notes) {
+                alert('Please enter some notes first!');
+                return;
+            }
+
+            showLoading('flashcardsBtn', '🃏 Make Flashcards');
+            
+            setTimeout(() => {
+                const flashcards = createFlashcards(notes);
+                
+                const flashcardsHTML = `
+                    <h3>🃏 Flashcards (${flashcards.length} cards)</h3>
+                    <p style="margin-bottom: 15px; color: #666;">Click on any card to flip it and see the answer!</p>
+                    ${flashcards.map((card, index) => `
+                        <div class="flashcard" onclick="flipCard(${index})">
+                            <div class="card-content" id="card-${index}">
+                                <strong>Q:</strong> ${card.question}
+                            </div>
+                        </div>
+                    `).join('')}
+                `;
+                
+                displayOutput('🃏 Flashcards Ready', flashcardsHTML);
+                
+                // Store flashcards data
+                window.currentFlashcards = flashcards;
+                stats.toolsGenerated++;
+                stats.flashcardsCreated = flashcards.length;
+                updateStats();
+                hideLoading('flashcardsBtn', '🃏 Make Flashcards');
+            }, 2000);
+        }
+
+        function toggleQuizSettings() {
+            const settings = document.getElementById('quizSettings');
+            if (settings.style.display === 'none') {
+                settings.style.display = 'block';
+                document.getElementById('quizBtn').innerHTML = '⚙️ Quiz Settings';
+            } else {
+                settings.style.display = 'none';
+                document.getElementById('quizBtn').innerHTML = '❓ Generate Quiz';
+            }
+        }
+
+        function generateQuiz() {
+            const notes = document.getElementById('notesInput').value.trim();
+            if (!notes) {
+                alert('Please enter some notes first!');
+                return;
+            }
+
+            // Hide settings panel
+            document.getElementById('quizSettings').style.display = 'none';
+            document.getElementById('quizBtn').innerHTML = '❓ Generate Quiz';
+
+            showLoading('quizBtn', '❓ Generate Quiz');
+            
+            setTimeout(() => {
+                const numQuestions = parseInt(document.getElementById('numQuestions').value);
+                const questionType = document.getElementById('questionType').value;
+                const difficulty = document.getElementById('difficulty').value;
+                
+                const quizQuestions = createAdvancedQuiz(notes, numQuestions, questionType, difficulty);
+                
+                const quizHTML = `
+                    <h3>❓ ${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)} Quiz (${quizQuestions.length} questions)</h3>
+                    <p style="margin-bottom: 15px; color: #666;">Test your knowledge! Click on your answer choice.</p>
+                    <div id="quizProgress" style="background: #e2e8f0; height: 6px; border-radius: 3px; margin-bottom: 20px;">
+                        <div style="background: #667eea; height: 100%; width: 0%; border-radius: 3px; transition: width 0.3s ease;"></div>
+                    </div>
+                    ${quizQuestions.map((q, index) => `
+                        <div class="quiz-question" id="question-${index}">
+                            <h4 style="margin-bottom: 15px;">Question ${index + 1}: ${getQuestionTypeIcon(q.type)}</h4>
+                            <p style="margin-bottom: 15px; font-weight: 500;">${q.question}</p>
+                            ${generateQuestionOptions(q, index)}
+                        </div>
+                    `).join('')}
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="tool-btn" onclick="showQuizResults()" style="width: auto; padding: 10px 20px;">
+                            📊 Show Results
+                        </button>
+                    </div>
+                `;
+                
+                displayOutput('❓ Quiz Generated', quizHTML);
+                window.currentQuiz = quizQuestions;
+                window.quizAnswers = new Array(quizQuestions.length).fill(null);
+                stats.toolsGenerated++;
+                stats.quizzesCompleted = quizQuestions.length;
+                updateStats();
+                hideLoading('quizBtn', '❓ Generate Quiz');
+            }, 2000);
+        }
+
+        function flipCard(index) {
+            const cardElement = document.getElementById(`card-${index}`);
+            const flashcard = cardElement.parentElement;
+            const card = window.currentFlashcards[index];
+            
+            if (flashcard.classList.contains('flipped')) {
+                cardElement.innerHTML = `<strong>Q:</strong> ${card.question}`;
+                flashcard.classList.remove('flipped');
+            } else {
+                cardElement.innerHTML = `<strong>A:</strong> ${card.answer}`;
+                flashcard.classList.add('flipped');
+            }
+        }
+
+        function selectAnswer(questionIndex, selectedIndex, correctIndex) {
+            const questionElement = document.querySelectorAll('.quiz-question')[questionIndex];
+            const options = questionElement.querySelectorAll('.quiz-option');
+            
+            // Remove previous selections
+            options.forEach(option => {
+                option.classList.remove('selected', 'correct', 'incorrect');
+            });
+            
+            // Mark selected answer
+            options[selectedIndex].classList.add('selected');
+            
+            // Show correct/incorrect after a brief delay
+            setTimeout(() => {
+                options[correctIndex].classList.add('correct');
+                if (selectedIndex !== correctIndex) {
+                    options[selectedIndex].classList.add('incorrect');
+                }
+            }, 500);
+        }
+
+        function clearAll() {
+            document.getElementById('notesInput').value = '';
+            const outputContent = document.getElementById('outputContent');
+            outputContent.innerHTML = `
+                <div class="placeholder">
+                    Select a study tool to get started!<br><br>
+                    ✨ <strong>Summary:</strong> Get key points and main ideas<br>
+                    🃏 <strong>Flashcards:</strong> Interactive cards for memorization<br>
+                    ❓ <strong>Quiz:</strong> Test your understanding
+                </div>
+            `;
+            outputContent.classList.remove('has-content');
+            document.getElementById('outputTitle').textContent = '🎯 Study Tools';
+            
+            // Reset stats
+            stats = { toolsGenerated: 0, flashcardsCreated: 0, quizzesCompleted: 0 };
+            updateStats();
+        }
+
+        function displayOutput(title, content) {
+            document.getElementById('outputTitle').textContent = title;
+            const outputContent = document.getElementById('outputContent');
+            outputContent.innerHTML = content;
+            outputContent.classList.add('has-content');
+        }
+
+        // Helper functions for content generation
+        function extractKeyPoints(sentences) {
+            return sentences
+                .slice(0, 5)
+                .map(s => s.trim())
+                .filter(s => s.length > 0)
+                .map(s => s.charAt(0).toUpperCase() + s.slice(1));
+        }
+
+        function generateSummaryText(sentences) {
+            const firstSentences = sentences.slice(0, 3).join('. ') + '.';
+            return firstSentences.length > 200 ? 
+                firstSentences.substring(0, 200) + '...' : 
+                firstSentences;
+        }
+
+        function createFlashcards(notes) {
+            const sentences = notes.split(/[.!?]+/).filter(s => s.trim().length > 20);
+            const flashcards = [];
+            
+            sentences.slice(0, 8).forEach((sentence, index) => {
+                const words = sentence.trim().split(' ');
+                if (words.length > 5) {
+                    const keyTerm = words[Math.floor(words.length / 3)];
+                    flashcards.push({
+                        question: `What concept relates to: "${words.slice(0, 5).join(' ')}..."?`,
+                        answer: sentence.trim()
+                    });
+                }
+            });
+            
+            return flashcards.slice(0, 6);
+        }
+
+        function createQuiz(notes) {
+            const sentences = notes.split(/[.!?]+/).filter(s => s.trim().length > 15);
+            const questions = [];
+            
+            sentences.slice(0, 4).forEach((sentence, index) => {
+                const words = sentence.trim().split(' ');
+                const keyWord = words[Math.floor(words.length / 2)];
+                
+                const options = [
+                    keyWord,
+                    `Alternative ${index + 1}`,
+                    `Option ${index + 2}`,
+                    `Choice ${index + 3}`
+                ];
+                
+                // Shuffle options
+                const shuffledOptions = [...options].sort(() => Math.random() - 0.5);
+                const correctIndex = shuffledOptions.indexOf(keyWord);
+                
+                questions.push({
+                    question: `Based on the notes, what key term is associated with: "${words.slice(0, 6).join(' ')}..."?`,
+                    options: shuffledOptions,
+                    correctIndex: correctIndex
+                });
+            });
+            
+            return questions;
+        }
+
+        function toggleQuizSettings() {
+            const settings = document.getElementById('quizSettings');
+            if (!settings) return;
+            
+            if (settings.style.display === 'none' || !settings.style.display) {
+                settings.style.display = 'block';
+                document.getElementById('quizBtn').innerHTML = '⚙️ Quiz Settings';
+            } else {
+                settings.style.display = 'none';
+                document.getElementById('quizBtn').innerHTML = '❓ Generate Quiz';
+            }
+        }
+
+        function getQuestionTypeIcon(type) {
+            switch(type) {
+                case 'multiple-choice': return '🔤';
+                case 'true-false': return '✓✗';
+                case 'fill-blank': return '📝';
+                default: return '❓';
+            }
+        }
+
+        function generateQuestionOptions(question, index) {
+            switch(question.type) {
+                case 'true-false':
+                    return `
+                        <div class="quiz-options">
+                            <div class="quiz-option" onclick="selectAnswer(${index}, 0, ${question.correctIndex}, 'true-false')">
+                                ✓ True
+                            </div>
+                            <div class="quiz-option" onclick="selectAnswer(${index}, 1, ${question.correctIndex}, 'true-false')">
+                                ✗ False
+                            </div>
+                        </div>
+                    `;
+                case 'fill-blank':
+                    return `
+                        <div class="quiz-options">
+                            <input type="text" class="quiz-option" placeholder="Type your answer here..." 
+                                   onchange="checkFillBlank(${index}, this.value)" 
+                                   style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; background: white;">
+                            <div id="fillBlankFeedback-${index}" style="margin-top: 10px; padding: 10px; border-radius: 6px; display: none;"></div>
+                        </div>
+                    `;
+                default: // multiple-choice
+                    return `
+                        <div class="quiz-options">
+                            ${question.options.map((option, optIndex) => `
+                                <div class="quiz-option" onclick="selectAnswer(${index}, ${optIndex}, ${question.correctIndex}, 'multiple-choice')">
+                                    ${String.fromCharCode(65 + optIndex)}. ${option}
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+            }
+        }
+
+        function checkFillBlank(questionIndex, userAnswer) {
+            if (!window.currentQuiz) return;
+            
+            const correctAnswer = window.currentQuiz[questionIndex].correctAnswer;
+            const feedback = document.getElementById(`fillBlankFeedback-${questionIndex}`);
+            
+            if (!window.quizAnswers) window.quizAnswers = [];
+            window.quizAnswers[questionIndex] = userAnswer;
+            
+            // Update progress
+            const answered = window.quizAnswers.filter(a => a !== null && a !== undefined && a !== '').length;
+            const progress = (answered / window.currentQuiz.length) * 100;
+            const progressBar = document.querySelector('#quizProgress div');
+            if (progressBar) {
+                progressBar.style.width = progress + '%';
+            }
+            
+            if (feedback) {
+                if (userAnswer.toLowerCase().trim() === correctAnswer.toLowerCase().trim()) {
+                    feedback.innerHTML = '✅ Correct!';
+                    feedback.style.background = '#d4edda';
+                    feedback.style.color = '#155724';
+                    feedback.style.border = '1px solid #c3e6cb';
+                } else {
+                    feedback.innerHTML = `❌ Incorrect. The answer is: <strong>${correctAnswer}</strong>`;
+                    feedback.style.background = '#f8d7da';
+                    feedback.style.color = '#721c24';
+                    feedback.style.border = '1px solid #f5c6cb';
+                }
+                
+                feedback.style.display = 'block';
+            }
+        }
+
+        function showQuizResults() {
+            if (!window.currentQuiz || !window.quizAnswers) return;
+            
+            let correct = 0;
+            const total = window.currentQuiz.length;
+            
+            window.quizAnswers.forEach((answer, index) => {
+                const question = window.currentQuiz[index];
+                if (question.type === 'fill-blank') {
+                    if (answer && answer.toLowerCase().trim() === question.correctAnswer.toLowerCase().trim()) {
+                        correct++;
+                    }
+                } else if (answer === question.correctIndex) {
+                    correct++;
+                }
+            });
+            
+            const percentage = Math.round((correct / total) * 100);
+            let grade, emoji;
+            
+            if (percentage >= 90) {
+                grade = 'Excellent!';
+                emoji = '🌟';
+            } else if (percentage >= 80) {
+                grade = 'Great job!';
+                emoji = '🎉';
+            } else if (percentage >= 70) {
+                grade = 'Good work!';
+                emoji = '👍';
+            } else if (percentage >= 60) {
+                grade = 'Keep studying!';
+                emoji = '📚';
+            } else {
+                grade = 'Review needed';
+                emoji = '💪';
+            }
+            
+            const resultsHTML = `
+                <div style="text-align: center; padding: 30px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 15px;">
+                    <h2>${emoji} ${grade}</h2>
+                    <div style="font-size: 3rem; margin: 20px 0;">${percentage}%</div>
+                    <p style="font-size: 1.2rem;">You got ${correct} out of ${total} questions correct!</p>
+                    <button class="tool-btn" onclick="toggleQuizSettings()" style="margin-top: 20px; background: rgba(255,255,255,0.2);">
+                        🔄 Create New Quiz
+                    </button>
+                </div>
+            `;
+            
+            displayOutput('📊 Quiz Results', resultsHTML);
+        }
+
+        function createAdvancedQuiz(notes, numQuestions, questionType, difficulty) {
+            const sentences = notes.split(/[.!?]+/).filter(s => s.trim().length > 15);
+            const questions = [];
+            
+            for (let i = 0; i < Math.min(numQuestions, sentences.length) && i < 10; i++) {
+                const sentence = sentences[i].trim();
+                
+                let questionData;
+                const selectedType = questionType === 'mixed' ? 
+                    ['multiple-choice', 'true-false', 'fill-blank'][Math.floor(Math.random() * 3)] : 
+                    questionType;
+                
+                switch(selectedType) {
+                    case 'true-false':
+                        questionData = createTrueFalseQuestion(sentence, difficulty);
+                        break;
+                    case 'fill-blank':
+                        questionData = createFillBlankQuestion(sentence, difficulty);
+                        break;
+                    default:
+                        questionData = createMultipleChoiceQuestion(sentence, i, difficulty);
+                }
+                
+                if (questionData) {
+                    questions.push(questionData);
+                }
+            }
+            
+            return questions;
+        }
+
+        function createTrueFalseQuestion(sentence, difficulty) {
+            const isTrue = Math.random() > 0.5;
+            let question;
+            
+            if (isTrue) {
+                question = `True or False: ${sentence}`;
+            } else {
+                // Create a false statement by modifying the sentence
+                const words = sentence.split(' ');
+                const modifiedWords = [...words];
+                const randomIndex = Math.floor(words.length / 2);
+                modifiedWords[randomIndex] = difficulty === 'hard' ? 'never' : 'not';
+                question = `True or False: ${modifiedWords.join(' ')}`;
+            }
+            
+            return {
+                type: 'true-false',
+                question: question,
+                options: ['True', 'False'],
+                correctIndex: isTrue ? 0 : 1
+            };
+        }
+
+        function createFillBlankQuestion(sentence, difficulty) {
+            const words = sentence.split(' ');
+            if (words.length < 5) return null;
+            
+            let blankIndex;
+            switch(difficulty) {
+                case 'easy':
+                    blankIndex = Math.floor(words.length * 0.7); // Later in sentence
+                    break;
+                case 'hard':
+                    blankIndex = Math.floor(words.length * 0.3); // Earlier in sentence
+                    break;
+                default:
+                    blankIndex = Math.floor(words.length / 2); // Middle
+            }
+            
+            const correctAnswer = words[blankIndex];
+            const questionWords = [...words];
+            questionWords[blankIndex] = '___________';
+            
+            return {
+                type: 'fill-blank',
+                question: questionWords.join(' '),
+                correctAnswer: correctAnswer
+            };
+        }
+
+        function createMultipleChoiceQuestion(sentence, index, difficulty) {
+            const words = sentence.trim().split(' ');
+            const keyWord = words[Math.floor(words.length / 2)];
+            
+            let distractors;
+            switch(difficulty) {
+                case 'easy':
+                    distractors = [`Option A`, `Choice B`, `Alternative C`];
+                    break;
+                case 'hard':
+                    distractors = [`${keyWord.slice(0,-2)}ing`, `${keyWord}s`, `Pre-${keyWord}`];
+                    break;
+                default:
+                    distractors = [`Alternative ${index + 1}`, `Option ${index + 2}`, `Choice ${index + 3}`];
+            }
+            
+            const options = [keyWord, ...distractors].sort(() => Math.random() - 0.5);
+            const correctIndex = options.indexOf(keyWord);
+            
+            return {
+                type: 'multiple-choice',
+                question: `Based on the notes, what key term is associated with: "${words.slice(0, 6).join(' ')}..."?`,
+                options: options,
+                correctIndex: correctIndex
+            };
+        }
+
+        // Add some sample content on load for demo purposes
+        window.addEventListener('load', () => {
+            const sampleNotes = `The Renaissance was a period of cultural, artistic, political and economic "rebirth" following the Middle Ages. It began in Italy in the 14th century and spread throughout Europe. The Renaissance emphasized humanism, which focused on human potential and achievements. Key figures included Leonardo da Vinci, Michelangelo, and William Shakespeare. The printing press, invented by Johannes Gutenberg, helped spread Renaissance ideas. Art became more realistic with the use of perspective and anatomical accuracy. The Scientific Revolution emerged from Renaissance thinking, challenging traditional views of the universe.`;
+            
+            document.getElementById('notesInput').value = sampleNotes;
+        });
+    </script>
+</body>
+</html>
